@@ -1,3 +1,6 @@
+# Jhax Refacter
+    A re-make attempt to fix some errors I encounterd with running this
+
 # Gitlab RCE - Remote Code Execution
 RCE for old gitlab version &lt;= 11.4.7 & 12.4.0-12.8.1
 
